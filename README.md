@@ -15,7 +15,7 @@ um programa para facilmente baixar sua playlist do spotify
 - aviso: o programa foi desenvolvido para ser utilizado em computadores e pode ser meio instável em um celular, não é garantido que funcione 100% e talvez trave⚠️
 1. baixe o [termux](https://github.com/termux/termux-app/releases/latest)
 2. digite os seguintes comandos:
-```
+```sh
 pkg update && pkg upgrade
 pkg install git
 pkg install nodejs
@@ -23,9 +23,9 @@ pkg install ffmpeg
 pkg install python
 ```
 3. siga os passos para PC
-4. digite os senguintes comandos para mover a playlist do terminal para a pasta de downloads do seu celular:
-```
+4. digite os senguintes comandos para mover as músicas da playlist do terminal para a pasta de músicas do seu celular:
+```sh
 termux-setup-storage
-mv /playlist ~/storage/downloads
+mv /output/* ~/storage/music
 ```
 5. utilize seu reprodutor de mídia favorito para reproduzir a playlist
