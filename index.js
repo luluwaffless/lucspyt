@@ -12,6 +12,17 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const prompt = promptSync();
+function getMusicMatch(results, title, artist, album) {
+    return new Promise((resolve) => {
+        for (const result of results) {
+            if (result.title === title && result.artists[0].name === artist && result.album === album) {
+                resolve(result);
+                return;
+            };
+        };
+        resolve(results[0]);
+    });
+};
 const removeInvalidCharacters = (str) => str.replace().replace(/\\|\/|\:|\*|\?|\"|\<|\>|\|/g, '');
 var session = {};
 
@@ -83,9 +94,13 @@ app.get('/callback', function(req, res) {
                                 session.searchqueries.push(searchquery);
                                 await searchMusics(searchquery)
                                     .then(async function(data) {
-                                        console.log(`${chalk.magenta("[DOWNLOAD]") + chalk.reset()} Baixando ${chalk.greenBright(searchquery) + chalk.reset()} (${chalk.blueBright("https://www.youtube.com/watch?v=" + data[0].youtubeId) + chalk.reset()})`)
+                                        const match = await getMusicMatch(data, obj.name, obj.artist, obj.album);
+                                        if (match === undefined) {
+                                            match = data[0];
+                                        };
+                                        console.log(`${chalk.magenta("[DOWNLOAD]") + chalk.reset()} Baixando ${chalk.greenBright(searchquery) + chalk.reset()} (${chalk.blueBright("https://www.youtube.com/watch?v=" + match.youtubeId) + chalk.reset()})`)
                                         const output = path.normalize(__dirname + `/output/${removeInvalidCharacters(obj.name)}.mp3`);
-                                        youtubedl(`https://www.youtube.com/watch?v=${data[0].youtubeId}`, {
+                                        youtubedl(`https://www.youtube.com/watch?v=${match.youtubeId}`, {
                                             extractAudio: true,
                                             ignoreErrors: true,
                                             noWarnings: true,
@@ -132,13 +147,13 @@ app.get('/callback', function(req, res) {
                         const interval = setInterval(async function() {
                             if (session.results.total === json.items.length) {
                                 clearInterval(interval);
-                                console.log(`${chalk.greenBright("[PRONTO]") + chalk.reset()} Baixado com sucesso! Você pode encontrar as músicas no diretório "/output".\nResultados: ${chalk.white("Total") + chalk.reset()}: ${session.results.total}; ${chalk.green("Completos") + chalk.reset()}: ${session.results.completed}; ${chalk.yellow("Pulados") + chalk.reset()}: ${session.results.skipped}; ${chalk.red("Erro de download") + chalk.reset()}: ${session.results.downerror}; ${chalk.red("Erro de marcação") + chalk.reset()}: ${session.results.tagerror}.`);
+                                console.log(`${chalk.greenBright("[PRONTO]") + chalk.reset()} Baixado com sucesso! Você pode encontrar as músicas no diretório "/playlist".\nResultados: ${chalk.white("Total") + chalk.reset()}: ${session.results.total}; ${chalk.green("Completos") + chalk.reset()}: ${session.results.completed}; ${chalk.yellow("Pulados") + chalk.reset()}: ${session.results.skipped}; ${chalk.red("Erro de download") + chalk.reset()}: ${session.results.downerror}; ${chalk.red("Erro de marcação") + chalk.reset()}: ${session.results.tagerror}.`);
                                 process.exit();
                             };
                         }, 1000);
                     } else {
                         console.log(`${chalk.red("[ERROR]") + chalk.reset()} Não foi possível ler a playlist. Erro: ` + body);
-				process.exit();
+				        process.exit();
                     };
                 });
             } else {
