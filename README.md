@@ -15,7 +15,7 @@ um programa para facilmente baixar sua playlist do spotify
 - aviso: o programa foi desenvolvido para ser utilizado em computadores e pode ser meio instável em um celular, não é garantido que funcione 100% e talvez trave⚠️
 1. baixe o [termux](https://github.com/termux/termux-app/releases/latest)
 2. digite os seguintes comandos:
-```sh
+```shell
 pkg update && pkg upgrade
 pkg install git
 pkg install nodejs
