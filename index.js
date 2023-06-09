@@ -147,7 +147,7 @@ app.get('/callback', function(req, res) {
                         const interval = setInterval(async function() {
                             if (session.results.total === json.items.length) {
                                 clearInterval(interval);
-                                console.log(`${chalk.greenBright("[PRONTO]") + chalk.reset()} Baixado com sucesso! Você pode encontrar as músicas no diretório "/playlist".\nResultados: ${chalk.white("Total") + chalk.reset()}: ${session.results.total}; ${chalk.green("Completos") + chalk.reset()}: ${session.results.completed}; ${chalk.yellow("Pulados") + chalk.reset()}: ${session.results.skipped}; ${chalk.red("Erro de download") + chalk.reset()}: ${session.results.downerror}; ${chalk.red("Erro de marcação") + chalk.reset()}: ${session.results.tagerror}.`);
+                                console.log(`${chalk.greenBright("[PRONTO]") + chalk.reset()} Baixado com sucesso! Você pode encontrar as músicas no diretório "/output".\nResultados: ${chalk.white("Total") + chalk.reset()}: ${session.results.total}; ${chalk.green("Completos") + chalk.reset()}: ${session.results.completed}; ${chalk.yellow("Pulados") + chalk.reset()}: ${session.results.skipped}; ${chalk.red("Erro de download") + chalk.reset()}: ${session.results.downerror}; ${chalk.red("Erro de marcação") + chalk.reset()}: ${session.results.tagerror}.`);
                                 process.exit();
                             };
                         }, 1000);
