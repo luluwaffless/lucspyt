@@ -149,13 +149,13 @@ app.get('/callback', function(req, res) {
                                     session.results.completed += 1;
                                 })
                                 .catch((err) => {
-                                    if (type === 2) {
-                                        console.log(`${chalk.red("[ERROR]") + chalk.reset()} Erro de marcação: ` + err);
+                                    if (err.type === 2) {
+                                        console.log(`${chalk.red("[ERROR]") + chalk.reset()} Erro de marcação: ` + err.err);
                                         session.results.total += 1;
                                         session.results.tagerror += 1;
                                         return;
                                     };
-                                    console.log(`${chalk.red("[ERROR]") + chalk.reset()} Erro de download: ` + err);
+                                    console.log(`${chalk.red("[ERROR]") + chalk.reset()} Erro de download: ` + err.err);
                                     session.results.total += 1;
                                     session.results.downerror += 1;
                                 });
