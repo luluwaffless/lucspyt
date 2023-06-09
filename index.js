@@ -84,7 +84,7 @@ app.get('/callback', function(req, res) {
                                 await searchMusics(searchquery)
                                     .then(async function(data) {
                                         console.log(`${chalk.magenta("[DOWNLOAD]") + chalk.reset()} Baixando ${chalk.greenBright(searchquery) + chalk.reset()} (${chalk.blueBright("https://www.youtube.com/watch?v=" + data[0].youtubeId) + chalk.reset()})`)
-                                        const output = path.normalize(__dirname + `/playlist/${removeInvalidCharacters(obj.name)}.mp3`);
+                                        const output = path.normalize(__dirname + `/output/${removeInvalidCharacters(obj.name)}.mp3`);
                                         youtubedl(`https://www.youtube.com/watch?v=${data[0].youtubeId}`, {
                                             extractAudio: true,
                                             ignoreErrors: true,
