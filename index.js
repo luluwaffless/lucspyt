@@ -149,5 +149,5 @@ app.get('/callback', function(req, res) {
     };
 });
 app.listen(5000, function() {
-    console.log(`${chalk.green("[SUCCESS]") + chalk.reset()} Authentication link generated, go to http://localhost:5000 to login.`)
+    console.log(`${chalk.green("[SUCESSO]") + chalk.reset()} Link de autenticação gerado. Vá para http://localhost:5000 para fazer login.`)
 });
