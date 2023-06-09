@@ -23,6 +23,54 @@ function getMusicMatch(results, title, artist, album) {
         resolve(results[0]);
     });
 };
+function donwload(obj) {
+    return new Promise(async function(resolve, reject) {
+        const searchquery = `${obj.name} - ${obj.artist}`
+        if (!session.searchqueries.includes(searchquery)) {
+            session.searchqueries.push(searchquery);
+            await searchMusics(searchquery)
+                .then(async function(data) {
+                    const match = await getMusicMatch(data, obj.name, obj.artist, obj.album);
+                    if (match === undefined) {
+                        match = data[0];
+                    };
+                    console.log(`${chalk.magenta("[DOWNLOAD]") + chalk.reset()} Baixando ${chalk.greenBright(searchquery) + chalk.reset()} (${chalk.blueBright("https://www.youtube.com/watch?v=" + match.youtubeId) + chalk.reset()})`)
+                    const output = path.normalize(__dirname + `/output/${removeInvalidCharacters(obj.name)}.mp3`);
+                    youtubedl(`https://www.youtube.com/watch?v=${match.youtubeId}`, {
+                        extractAudio: true,
+                        ignoreErrors: true,
+                        noWarnings: true,
+                        audioFormat: "mp3",
+                        output: output
+                    }).then(async function() {
+                        console.log(`${chalk.cyan("[TAG]") + chalk.reset()} Marcando ${chalk.blueBright(output) + chalk.reset()} (${chalk.greenBright(searchquery) + chalk.reset()})`)
+                        const response = await axios.get(obj.img, {
+                            responseType: 'arraybuffer'
+                        });
+                        const buffer = Buffer.from(response.data, "utf-8");
+                        const mime = await fileTypeFromBuffer(buffer);
+                        NodeID3.write({
+                            title: obj.name,
+                            artist: obj.artist,
+                            album: obj.album,
+                            image: {
+                                mime: mime.mime,
+                                type: {
+                                    id: 3
+                                },
+                                description: "",
+                                imageBuffer: buffer
+                            }
+                        }, output, (err) => {
+                            if (!err) { resolve({skipped: false, searchquery: searchquery, output: output}); } else reject({type: 2, err: err});
+                        });
+                    }).catch((err) => {
+                        reject({type: 1, err: err});
+                    });
+                });
+        } else resolve({skipped: true, searchquery: searchquery, output: null});
+    });
+};
 const removeInvalidCharacters = (str) => str.replace().replace(/\\|\/|\:|\*|\?|\"|\<|\>|\|/g, '');
 var session = {};
 
@@ -87,67 +135,35 @@ app.get('/callback', function(req, res) {
                         session.results.downerror = 0;
                         session.results.skipped = 0;
                         session.searchqueries = [];
-                        for (const [index, resp] of json.items.entries()) {
-                            const obj = {artist: resp.track.artists[0].name, name: resp.track.name, album: resp.track.album.name, img: resp.track.album.images[0].url};
-                            const searchquery = `${obj.name} - ${obj.artist}`
-                            if (!session.searchqueries.includes(searchquery)) {
-                                session.searchqueries.push(searchquery);
-                                await searchMusics(searchquery)
-                                    .then(async function(data) {
-                                        const match = await getMusicMatch(data, obj.name, obj.artist, obj.album);
-                                        if (match === undefined) {
-                                            match = data[0];
-                                        };
-                                        console.log(`${chalk.magenta("[DOWNLOAD]") + chalk.reset()} Baixando ${chalk.greenBright(searchquery) + chalk.reset()} (${chalk.blueBright("https://www.youtube.com/watch?v=" + match.youtubeId) + chalk.reset()})`)
-                                        const output = path.normalize(__dirname + `/output/${removeInvalidCharacters(obj.name)}.mp3`);
-                                        youtubedl(`https://www.youtube.com/watch?v=${match.youtubeId}`, {
-                                            extractAudio: true,
-                                            ignoreErrors: true,
-                                            noWarnings: true,
-                                            audioFormat: "mp3",
-                                            output: output
-                                        }).then(async function() {
-                                            console.log(`${chalk.cyan("[TAG]") + chalk.reset()} Marcando ${chalk.blueBright(output) + chalk.reset()} (${chalk.greenBright(searchquery) + chalk.reset()})`)
-                                            const response = await axios.get(obj.img,  {responseType:'arraybuffer'});
-                                            const buffer = Buffer.from(response.data, "utf-8");
-                                            const mime = await fileTypeFromBuffer(buffer);
-                                            NodeID3.write({
-                                                title: obj.name,
-                                                artist: obj.artist,
-                                                album: obj.album,
-                                                image: {
-                                                    mime: mime.mime,
-                                                    type: { id: 3 },
-                                                    description: "",
-                                                    imageBuffer: buffer
-                                                }
-                                            }, output, async function(err) {
-                                                if (!err) {
-                                                    console.log(`${chalk.green("[SUCESSO]") + chalk.reset()} ${chalk.blueBright(output) + chalk.reset()} completado (${chalk.greenBright(searchquery) + chalk.reset()})`)
-                                                    session.results.total += 1
-                                                    session.results.completed += 1
-                                                } else {
-                                                    console.log(`${chalk.red("[ERROR]") + chalk.reset()} Erro de marcação: ` + err)
-                                                    session.results.total += 1
-                                                    session.results.tagerror += 1
-                                                };
-                                            });
-                                        }).catch(async function(err) {
-                                            console.log(`${chalk.red("[ERROR]") + chalk.reset()} Erro de download: ` + err)
-                                            session.results.total += 1
-                                            session.results.downerror += 1
-                                        });
-                                    });
-                            } else {
-                                console.log(`${chalk.yellow("[AVISO]") + chalk.reset()} ${chalk.greenBright(searchquery) + chalk.reset()} já procurado, pulando.`)
-                                session.results.total += 1;
-                                session.results.skipped += 1;
-                            };
+                        for (const resp of json.items) {
+                            await donwload({artist: resp.track.artists[0].name, name: resp.track.name, album: resp.track.album.name, img: resp.track.album.images[0].url})
+                                .then((result) => {
+                                    if (result.skipped) {
+                                        console.log(`${chalk.yellow("[AVISO]") + chalk.reset()} ${chalk.greenBright(result.searchquery) + chalk.reset()} já procurado, pulando.`);
+                                        session.results.total += 1;
+                                        session.results.skipped += 1;
+                                        return;
+                                    };
+                                    console.log(`${chalk.green("[SUCESSO]") + chalk.reset()} ${chalk.blueBright(result.output) + chalk.reset()} completado (${chalk.greenBright(result.searchquery) + chalk.reset()})`);
+                                    session.results.total += 1;
+                                    session.results.completed += 1;
+                                })
+                                .catch((err) => {
+                                    if (type === 2) {
+                                        console.log(`${chalk.red("[ERROR]") + chalk.reset()} Erro de marcação: ` + err);
+                                        session.results.total += 1;
+                                        session.results.tagerror += 1;
+                                        return;
+                                    };
+                                    console.log(`${chalk.red("[ERROR]") + chalk.reset()} Erro de download: ` + err);
+                                    session.results.total += 1;
+                                    session.results.downerror += 1;
+                                });
                         };
                         const interval = setInterval(async function() {
                             if (session.results.total === json.items.length) {
                                 clearInterval(interval);
-                                console.log(`${chalk.greenBright("[PRONTO]") + chalk.reset()} Baixado com sucesso! Você pode encontrar as músicas no diretório "/output".\nResultados: ${chalk.white("Total") + chalk.reset()}: ${session.results.total}; ${chalk.green("Completos") + chalk.reset()}: ${session.results.completed}; ${chalk.yellow("Pulados") + chalk.reset()}: ${session.results.skipped}; ${chalk.red("Erro de download") + chalk.reset()}: ${session.results.downerror}; ${chalk.red("Erro de marcação") + chalk.reset()}: ${session.results.tagerror}.`);
+                                console.log(`${chalk.greenBright("[PRONTO]") + chalk.reset()} Baixado com sucesso! Você pode encontrar as músicas no diretório "/playlist".\nResultados: ${chalk.white("Total") + chalk.reset()}: ${session.results.total}; ${chalk.green("Completos") + chalk.reset()}: ${session.results.completed}; ${chalk.yellow("Pulados") + chalk.reset()}: ${session.results.skipped}; ${chalk.red("Erro de download") + chalk.reset()}: ${session.results.downerror}; ${chalk.red("Erro de marcação") + chalk.reset()}: ${session.results.tagerror}.`);
                                 process.exit();
                             };
                         }, 1000);
