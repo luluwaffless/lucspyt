@@ -59,7 +59,7 @@ app.get('/callback', function(req, res) {
         request.post(authOptions, function(e, r, b) {
             if (!e && r.statusCode === 200) {
                 session.loggedin = true
-                console.log(`${chalk.green("[SUCCESSO]") + chalk.reset()} Login feito.`)
+                console.log(`${chalk.green("[SUCESSO]") + chalk.reset()} Login feito.`)
                 request.get({
                     url: `https://api.spotify.com/v1/playlists/${session.playlist}/tracks`,
                     headers: {
@@ -67,7 +67,7 @@ app.get('/callback', function(req, res) {
                     }
                 }, async function(error, response, body) {
                     if (!error && response.statusCode === 200) {
-                        console.log(`${chalk.green("[SUCCESSO]") + chalk.reset()} Playlist lida.`)
+                        console.log(`${chalk.green("[SUCESSO]") + chalk.reset()} Playlist lida.`)
                         const json = JSON.parse(body);
                         session.results = {};
                         session.results.total = 0;
@@ -108,7 +108,7 @@ app.get('/callback', function(req, res) {
                                                 }
                                             }, output, async function(err) {
                                                 if (!err) {
-                                                    console.log(`${chalk.green("[SUCCESSO]") + chalk.reset()} ${chalk.blueBright(output) + chalk.reset()} completado (${chalk.greenBright(searchquery) + chalk.reset()})`)
+                                                    console.log(`${chalk.green("[SUCESSO]") + chalk.reset()} ${chalk.blueBright(output) + chalk.reset()} completado (${chalk.greenBright(searchquery) + chalk.reset()})`)
                                                     session.results.total += 1
                                                     session.results.completed += 1
                                                 } else {
