@@ -23,7 +23,7 @@ pkg install nodejs
 pkg install ffmpeg
 pkg install python
 ```
-3. siga os passos para PC
+3. siga os passos para PC (nota ao copiar sua playlist: o spotify irá gerar um query unico que sempre começa com `?`, são os caracteres após o ID da playlist, apague-os para que o programa detecte sua playlist)
 4. digite os senguintes comandos para mover as músicas da playlist do terminal para a pasta de músicas do seu celular:
 ```sh
 termux-setup-storage
