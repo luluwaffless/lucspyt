@@ -1,5 +1,6 @@
 # lucspyt 🎶 [![forthebadge](https://forthebadge.com/images/badges/made-with-javascript.svg)](https://forthebadge.com)
 um programa para facilmente baixar sua playlist do spotify
+tutorial de como usar em vídeo que até um bebê entende: https://www.youtube.com/watch?v=iMBIrGx2oyE
 # requisitos 📚
 - [node.js e npm](https://nodejs.org/)
 - [ffmpeg](https://ffmpeg.org/)
@@ -12,7 +13,7 @@ um programa para facilmente baixar sua playlist do spotify
 5. vá para `http://localhost:5000` onde você será redirecionado para fazer login com spotify
 6. após isso, a sua playlist começara a ser baixada no diretório `/playlist` e pronto!
 # como usar (em celular android) 📱
-- aviso: o programa foi desenvolvido para ser utilizado em computadores e pode ser meio instável em um celular, não é garantido que funcione 100% e talvez trave⚠️
+- aviso: o programa foi desenvolvido para ser utilizado em computadores e pode ter problemas de download das músicas no celular!
 1. baixe o [termux](https://github.com/termux/termux-app/releases/latest)
 2. digite os seguintes comandos:
 ```shell
