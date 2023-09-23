@@ -1,6 +1,5 @@
 # lucspyt 🎶 [![forthebadge](https://forthebadge.com/images/badges/made-with-javascript.svg)](https://forthebadge.com)
 um programa para facilmente baixar sua playlist do spotify
-tutorial de como usar em vídeo que até um bebê entende: https://www.youtube.com/watch?v=iMBIrGx2oyE
 # requisitos 📚
 - [node.js e npm](https://nodejs.org/)
 - [ffmpeg](https://ffmpeg.org/)
