@@ -20,6 +20,7 @@ function getMusicMatch(results, title, artist, album) {
                 return;
             };
         };
+	const choice = prompt(`${chalk.blue("[ENTRADA]") + chalk.reset()} Analise as alternativas:\n${results}\nInsira a sua alternativa de download: `)
         resolve(results[0]);
     });
 };
