@@ -5,7 +5,7 @@ um programa para facilmente baixar sua playlist do spotify
 - [ffmpeg](https://ffmpeg.org/)
 - [python](https://www.python.org/)
 # como usar 💻
-1. baixe os requisitos e clone o repositório usando ```git clone https://github.com/luca4s/lucspyt.git && cd lucspyt``` (ou baixe diretamente do github)
+1. baixe os requisitos e clone o repositório usando ```git clone https://github.com/luluwaffless/lucspyt.git && cd lucspyt``` (ou baixe diretamente do github)
 2. no terminal do repositório, baixe as dependências utilizando `npm i`
 3. inicie o programa com `npm start` ou `node index.js`
 4. insira a URL da sua playlist do spotify, deve ter 56 caracteres de tamanho e começar com `https://open.spotify.com/playlist/`
