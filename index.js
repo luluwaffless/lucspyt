@@ -12,6 +12,17 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const prompt = promptSync();
+function parse(results) {
+    let returnStr = "";
+    for (let i = 0; i < results.length; i++) {
+        let artists = [];
+        results[i].artists.forEach(artist => {
+            artists.push(artist.name);
+        });
+        returnStr += `${i + 1}. ${chalk.greenBright(results[i].title + " - " + results[i].album + " - " + artists.join(", ")) + chalk.reset()} (${chalk.blueBright("https://www.youtube.com/watch?v=" + results[i].youtubeId) + chalk.reset()})\n`
+    };
+    return returnStr;
+};
 function getMusicMatch(results, title, artist, album) {
     return new Promise((resolve) => {
         for (const result of results) {
@@ -20,8 +31,26 @@ function getMusicMatch(results, title, artist, album) {
                 return;
             };
         };
-	const choice = prompt(`${chalk.blue("[ENTRADA]") + chalk.reset()} Analise as alternativas:\n${results}\nInsira a sua alternativa de download: `)
-        resolve(results[0]);
+        console.log(`${chalk.yellow("[AVISO]") + chalk.reset()} Não foi possivel encontrar a alternativa mais compatível para ${chalk.greenBright(title + " - " + album + " - " + artist) + chalk.reset()}. Analise as alternativas a seguir: \n${parse(results)}`)
+	    const choice = prompt(`${chalk.blue("[ENTRADA]") + chalk.reset()} Insira a sua alternativa de download, um ID de vídeo caso a alternativa não esteja mencionada, ou aperte ENTER para escolher a primeira: `)
+        if (Number(choice) || choice == "") {
+            if (results[(Number(choice) - 1)]) {
+                resolve(results[(Number(choice) - 1)]);
+            } else {
+                resolve(results[0]);
+            }
+        } else {
+            resolve({
+                youtubeId: choice,
+                title: title,
+                artists: [
+                    {
+                        name: artist
+                    }
+                ],
+                album: album
+            });
+        };
     });
 };
 function donwload(obj) {
