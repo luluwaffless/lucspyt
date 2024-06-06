@@ -10,8 +10,10 @@ import youtubedl from 'youtube-dl-exec';
 import NodeID3 from 'node-id3';
 import path from 'path';
 import {fileURLToPath} from 'url';
+const removeInvalidCharacters = (str) => str.replace().replace(/\\|\/|\:|\*|\?|\"|\<|\>|\|/g, '');
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const prompt = promptSync();
+var session = {};
 function parse(results) {
     let returnStr = "";
     for (let i = 0; i < results.length; i++) {
@@ -71,6 +73,7 @@ function donwload(obj) {
                         ignoreErrors: true,
                         noWarnings: true,
                         audioFormat: "mp3",
+                        audioQuality: 0,
                         output: output
                     }).then(async function() {
                         console.log(`${chalk.cyan("[TAG]") + chalk.reset()} Marcando ${chalk.blueBright(output) + chalk.reset()} (${chalk.greenBright(searchquery) + chalk.reset()})`)
@@ -101,8 +104,6 @@ function donwload(obj) {
         } else resolve({skipped: true, searchquery: searchquery, output: null});
     });
 };
-const removeInvalidCharacters = (str) => str.replace().replace(/\\|\/|\:|\*|\?|\"|\<|\>|\|/g, '');
-var session = {};
 
 var playlistValid = false;
 while (!playlistValid) {
